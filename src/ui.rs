@@ -8,11 +8,10 @@ use crate::{
 use ratatui::{
     buffer::Buffer,
     layout::{Alignment, Constraint, Direction, Layout, Offset, Rect},
-    style::{Color, Modifier, Style, Stylize},
+    style::{Color, Modifier, Style},
     text::{Line, Span, Text},
     widgets::{
-        block::Position, Block, Borders, Paragraph, Row, StatefulWidget, Table, TableState, Widget,
-        Wrap,
+        Block, Borders, Paragraph, Row, StatefulWidget, Table, TableState, Widget, Wrap,
     },
     Frame,
 };
@@ -104,8 +103,7 @@ impl<'a> FlamelensWidget<'a> {
                         Block::new()
                             .borders(Borders::TOP)
                             .title(format!("{} ", title))
-                            .title_style(Style::default().add_modifier(Modifier::BOLD).yellow())
-                            .title_position(Position::Top),
+                            .title_style(Style::default().add_modifier(Modifier::BOLD).yellow()),
                     )
             })
             .collect::<Vec<Paragraph>>();
