@@ -770,9 +770,15 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     // See the following resources:
     // - https://docs.rs/ratatui/latest/ratatui/widgets/index.html
     // - https://github.com/ratatui-org/ratatui/tree/master/examples
-    let flamelens_widget = FlamelensWidget::new(app);
+    render_in_area(app, frame.area(), frame.buffer_mut());
+}
+
+/// Renders into an explicit area of a buffer, for embedding flamelens as a
+/// widget inside another ratatui application. Returns the cursor position
+/// requested by the input buffer (if any).
+pub fn render_in_area(app: &mut App, area: Rect, buf: &mut Buffer) -> Option<(u16, u16)> {
     let mut flamelens_state = FlamelensWidgetState::default();
-    frame.render_stateful_widget(flamelens_widget, frame.area(), &mut flamelens_state);
+    FlamelensWidget::new(app).render_all(area, buf, &mut flamelens_state);
     app.flamegraph_view
         .set_frame_height(flamelens_state.frame_height);
     app.flamegraph_view
@@ -781,4 +787,5 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     if let Some(input_buffer) = &mut app.input_buffer {
         input_buffer.cursor = flamelens_state.cursor_position;
     }
+    flamelens_state.cursor_position
 }
