@@ -202,6 +202,14 @@ impl<'a> FlamelensWidget<'a> {
                     help_tags.add("z", "freeze");
                 }
             }
+            if self.app.is_live() {
+                if self.app.flamegraph_state().freeze {
+                    help_tags.add("P", "resume updates");
+                } else {
+                    help_tags.add("P", "pause updates");
+                }
+                help_tags.add("D", "toggle diff");
+            }
         } else {
             help_tags.add("j/k", "move cursor");
             help_tags.add("f/b", "scroll");
@@ -564,7 +572,24 @@ impl<'a> FlamelensWidget<'a> {
 
     fn get_header_text(&self, _width: u16) -> Line<'_> {
         let mut header_text = match &self.app.flamegraph_input {
-            FlameGraphInput::File(path) => path.to_string(),
+            FlameGraphInput::File(path) => {
+                let mut out = path.to_string();
+                if self.app.is_live() {
+                    if self.app.flamegraph_state().freeze {
+                        out += " [paused; press 'P' to resume]";
+                    } else {
+                        out += format!(
+                            " [updated {}s ago]",
+                            self.app.flamegraph_view.updated_at.elapsed().as_secs()
+                        )
+                        .as_str();
+                    }
+                    if self.app.flamegraph().diff_mode {
+                        out += " [diff vs previous update]";
+                    }
+                }
+                out
+            }
             FlameGraphInput::Pid(pid, info) => {
                 let mut out = format!("Process: {}", pid);
                 if let Some(info) = info {
